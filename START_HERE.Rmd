@@ -1,0 +1,161 @@
+---
+title: "Cryptocurrency Research"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+# Cryptocurrency Research
+
+Full version of the tutorial: http://cryptocurrencyresearch.org/
+
+
+## Explore Data
+https://cryptocurrencyresearch.org/explore-data.html
+
+```{r}
+library(PredictCrypto)
+```
+
+
+```{r}
+messari <- get_crypto_data()
+```
+
+
+```{r}
+head(messari)
+```
+
+
+```{r}
+messari <- subset(messari, Name == 'Bitcoin' | Name == 'Ethereum' | Name == 'XRP' | Name == 'Bitcoin Cash' | Name == 'BNB' |
+                  Name == 'Bitcoin SV' | Name == 'Litecoin' | Name == 'EOS' | Name == 'Tezos' | Name == 'Cardano')
+```
+
+
+### Data Quality
+https://cryptocurrencyresearch.org/explore-data.html#data-quality
+
+```{r}
+library(skimr)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+data_quality_overview <- skim(messari)
+```
+
+```{r}
+data_quality_overview
+```
+
+```{r}
+colnames(data_quality_overview)
+```
+
+```{r}
+subset(data_quality_overview, complete_rate > 0.7)
+```
+
+## Data Prep
+https://cryptocurrencyresearch.org/data-prep.html
+
+## Convert Date Time
+https://cryptocurrencyresearch.org/data-prep.html#convert-date-time
+
+Before:
+```{r}
+class(messari$DateExtracted)
+class(messari$DateTimeColoradoMST)
+```
+
+```{r}
+library(anytime)
+messari$DateExtracted <- anytime(messari$DateExtracted, tz = 'America/Denver')
+messari$DateTimeColoradoMST <- anytime(messari$DateTimeColoradoMST, tz = 'America/Denver')
+```
+
+After:
+```{r}
+class(messari$DateExtracted)
+class(messari$DateTimeColoradoMST)
+```
+
+
+### Column Names
+https://cryptocurrencyresearch.org/data-prep.html#convert-date-time
+
+Before:
+```{r}
+colnames(messari)
+```
+
+```{r}
+library(janitor)
+messari <- clean_names(messari)
+```
+
+After:
+```{r}
+colnames(messari)
+```
+
+### Prices By Exchange
+https://cryptocurrencyresearch.org/data-prep.html#prices-by-exchange
+
+```{r}
+prices_by_exchange <- get_prices_by_exchange()
+```
+
+
+```{r}
+prices_by_exchange
+```
+
+
+```{r}
+# Counts by exchange
+prices_by_exchange %>% group_by(Exchange) %>% count()
+```
+
+### HitBTC
+https://cryptocurrencyresearch.org/data-prep.html#hitbtc
+
+```{r}
+HitBTC <- prices_by_exchange %>% filter(Exchange == 'HitBTC')
+```
+
+```{r}
+# Preview of Ethereum data
+HitBTC %>% filter(Name=='Ethereum')
+```
+
+
+```{r}
+crypto_data <- crypto_data_join(messari, HitBTC)
+```
+
+
+
+
+### Add Target Variable
+
+KEEP GOING!
+
+
+
+
+
+
+
+
